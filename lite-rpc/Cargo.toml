@@ -41,7 +41,8 @@ async-trait = { workspace = true }
 tokio = { version = "1.28.2", features = ["full", "fs"]}
 tokio-postgres = { version = "0.7.8", features = ["with-chrono-0_4"] }
 chrono = { workspace = true }
-
+actix-rt = "2.7.0"
+actix-web = "4.0.0"
 solana-lite-rpc-core = { workspace = true }
 solana-lite-rpc-services = { workspace = true }
 solana-lite-rpc-cluster-endpoints = { workspace = true }
