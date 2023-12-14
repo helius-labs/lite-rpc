@@ -1,5 +1,5 @@
 pub mod rpc_tester;
-
+pub mod health_check;
 use std::time::Duration;
 
 use anyhow::bail;
@@ -250,6 +250,9 @@ pub async fn main() -> anyhow::Result<()> {
     let rpc_client = Arc::new(RpcClient::new(rpc_addr.clone()));
     let rpc_tester = tokio::spawn(RpcTester::new(rpc_client.clone()).start());
 
+    let health_addr = "127.0.0.1:8080"; // move to config
+    let health_service = health_check::start_health_service(health_addr);
+
     let main = start_lite_rpc(config, rpc_client);
 
     tokio::select! {
@@ -264,6 +267,13 @@ pub async fn main() -> anyhow::Result<()> {
         }
         _ = ctrl_c_signal => {
             log::info!("Received ctrl+c signal");
+            Ok(())
+        }
+        res = health_service => {
+            match res {
+                Ok(_) => log::info!("Health service stopped"),
+                Err(err) => log::error!("Health service error: {err}"),
+            }
             Ok(())
         }
     }
